@@ -42,7 +42,7 @@ function ServiceDetailsContent() {
   const [problemDescription, setProblemDescription] = useState("");
 
   const apiUrl =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+    process.env.NEXT_PUBLIC_API_URL || "https://fixmate-server-qwhq.onrender.com/api";
 
   // Load service details
   useEffect(() => {

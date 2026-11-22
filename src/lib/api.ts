@@ -5,7 +5,7 @@ import { authClient } from "./auth-client";
 const api = axios.create({
   baseURL:
     process.env.NEXT_PUBLIC_API_URL ||
-    "http://localhost:5000/api",
+    "https://fixmate-server-qwhq.onrender.com/api",
 
   withCredentials: true,
 
