@@ -11,6 +11,7 @@ import {
 } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowLeft,
   Loader2,
@@ -78,14 +79,11 @@ function EditServiceContent() {
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState(false);
 
-  // Load service owned by the logged-in technician
   const loadService = useCallback(async () => {
     try {
       setLoadError(false);
 
-      const response = await api.get(
-        `/services/my/${serviceId}`
-      );
+      const response = await api.get(`/services/my/${serviceId}`);
 
       const service: ServiceData | undefined =
         response.data?.service;
@@ -114,7 +112,6 @@ function EditServiceContent() {
     }
   }, [serviceId]);
 
-  // Authentication and service loading
   useEffect(() => {
     if (isPending) return;
 
@@ -143,7 +140,6 @@ function EditServiceContent() {
     };
   }, [isPending, session, router, loadService]);
 
-  // Handle input changes
   const handleChange = (
     event: ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -157,7 +153,6 @@ function EditServiceContent() {
     }));
   };
 
-  // Handle image selection
   const handleImageChange = (
     event: ChangeEvent<HTMLInputElement>
   ) => {
@@ -187,7 +182,6 @@ function EditServiceContent() {
     setImageFile(file);
   };
 
-  // Update service
   const handleSubmit = async (
     event: FormEvent<HTMLFormElement>
   ) => {
@@ -216,7 +210,6 @@ function EditServiceContent() {
 
       let imageUrl = currentImage;
 
-      // Upload new image only if selected
       if (imageFile) {
         const imageData = new FormData();
         imageData.append("image", imageFile);
@@ -510,9 +503,12 @@ function EditServiceContent() {
 
             {currentImage && (
               <div className="mb-4 overflow-hidden rounded-xl border border-slate-200">
-                <img
+                <Image
                   src={currentImage}
                   alt="Current service"
+                  width={900}
+                  height={520}
+                  unoptimized
                   className="h-52 w-full object-cover"
                 />
                 <p className="bg-slate-50 px-3 py-2 text-xs text-slate-500">

@@ -4,6 +4,7 @@
 import { useEffect, useState, type FormEvent, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowLeft,
   Upload,
@@ -57,9 +58,9 @@ export default function AddServicePage() {
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
- const userRole = (
-  session?.user as { role?: string } | null | undefined
-)?.role;
+  const userRole = (
+    session?.user as { role?: string } | null | undefined
+  )?.role;
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -156,9 +157,7 @@ export default function AddServicePage() {
         throw new Error(response.data?.message || "Unable to create service.");
       }
 
-      toast.success(
-        "Service submitted! Waiting for admin approval."
-      );
+      toast.success("Service submitted! Waiting for admin approval.");
 
       setForm(initialForm);
       setImage(null);
@@ -169,7 +168,6 @@ export default function AddServicePage() {
       ) as HTMLInputElement | null;
 
       if (fileInput) fileInput.value = "";
-
     } catch (error: unknown) {
       console.error("Add service error:", error);
 
@@ -210,7 +208,6 @@ export default function AddServicePage() {
   return (
     <section className="bg-slate-50 px-4 py-12 sm:px-6 lg:py-16">
       <div className="mx-auto max-w-4xl">
-
         <Link
           href="/"
           className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-teal-700"
@@ -373,9 +370,12 @@ export default function AddServicePage() {
             <div className="mt-5">
               {preview ? (
                 <div className="relative max-w-md overflow-hidden rounded-xl border border-slate-200">
-                  <img
+                  <Image
                     src={preview}
                     alt="Service preview"
+                    width={448}
+                    height={224}
+                    unoptimized
                     className="h-56 w-full object-cover"
                   />
                   <button

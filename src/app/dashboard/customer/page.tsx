@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   CalendarDays,
   ClipboardList,
@@ -43,6 +45,7 @@ type Booking = {
 };
 
 export default function CustomerDashboardPage() {
+  const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -70,14 +73,14 @@ export default function CustomerDashboardPage() {
     if (isPending) return;
 
     if (!session) {
-      window.location.href = "/sign-in";
+      router.push("/sign-in");
       return;
     }
 
     const role = (session.user as { role?: string }).role;
 
     if (role !== "customer") {
-      window.location.href = "/";
+      router.push("/");
       return;
     }
 
@@ -92,7 +95,7 @@ export default function CustomerDashboardPage() {
     return () => {
       active = false;
     };
-  }, [isPending, session, loadBookings]);
+  }, [isPending, session, loadBookings, router]);
 
   const handleRefresh = async () => {
     setLoading(true);
@@ -191,7 +194,7 @@ export default function CustomerDashboardPage() {
     <section className="min-h-screen bg-slate-50 px-4 py-12 sm:px-6">
       <div className="mx-auto max-w-7xl">
         {/* Welcome section */}
-        <div className="mb-8 overflow-hidden rounded-3xl bg-gradient-to-r from-teal-800 to-teal-600 p-7 text-white shadow-lg sm:p-10">
+        <div className="mb-8 overflow-hidden rounded-3xl bg-linear-to-r from-teal-800 to-teal-600 p-7 text-white shadow-lg sm:p-10">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.15em] text-teal-100">
@@ -386,12 +389,15 @@ export default function CustomerDashboardPage() {
                   className="flex flex-col gap-4 p-5 transition hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between sm:p-6"
                 >
                   <div className="flex min-w-0 items-center gap-4">
-                    <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100">
                       {booking.serviceImage ? (
-                        <img
+                        <Image
                           src={booking.serviceImage}
                           alt={booking.serviceTitle}
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="64px"
+                          unoptimized
+                          className="object-cover"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center">

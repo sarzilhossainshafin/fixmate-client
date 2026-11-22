@@ -71,10 +71,10 @@ export default function HomePage() {
     <>
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-slate-950">
-        <div className="absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-teal-500/20 blur-3xl" />
-        <div className="absolute -bottom-48 -left-40 h-[500px] w-[500px] rounded-full bg-blue-500/10 blur-3xl" />
+        <div className="absolute -right-40 -top-40 h-125 w-125 rounded-full bg-teal-500/20 blur-3xl" />
+        <div className="absolute -bottom-48 -left-40 h-125 w-125 rounded-full bg-blue-500/10 blur-3xl" />
 
-        <div className="container-custom relative grid min-h-[610px] items-center gap-12 py-20 lg:grid-cols-2">
+        <div className="container-custom relative grid 	min-h-152.5 items-center gap-12 py-20 lg:grid-cols-2">
           <div>
             <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-teal-400/30 bg-teal-400/10 px-4 py-2 text-sm font-semibold text-teal-300">
               <span className="h-2 w-2 rounded-full bg-teal-400" />

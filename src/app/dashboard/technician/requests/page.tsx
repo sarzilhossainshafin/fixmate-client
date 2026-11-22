@@ -3,11 +3,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   RefreshCw,
   Loader2,
-  ClipboardList,
   Clock,
   CheckCircle2,
   XCircle,
@@ -62,6 +63,7 @@ const filters = [
 ];
 
 export default function TechnicianRequestsPage() {
+  const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -89,19 +91,18 @@ export default function TechnicianRequestsPage() {
     }
   }, []);
 
-  // Authentication and role check
   useEffect(() => {
     if (isPending) return;
 
     if (!session) {
-      window.location.href = "/sign-in";
+      router.replace("/sign-in");
       return;
     }
 
     const role = (session.user as { role?: string }).role;
 
     if (role !== "technician") {
-      window.location.href = "/";
+      router.replace("/");
       return;
     }
 
@@ -116,14 +117,13 @@ export default function TechnicianRequestsPage() {
     return () => {
       active = false;
     };
-  }, [isPending, session, loadBookings]);
+  }, [isPending, session, router, loadBookings]);
 
   const handleRefresh = async () => {
     setLoading(true);
     await loadBookings();
   };
 
-  // Update booking status
   const handleStatusUpdate = async (
     booking: Booking,
     status: BookingStatus
@@ -135,10 +135,11 @@ export default function TechnicianRequestsPage() {
 
       if (!confirmed) return;
     }
-const payload: {
-  status: BookingStatus;
-  finalAmount?: number;
-} = { status };
+
+    const payload: {
+      status: BookingStatus;
+      finalAmount?: number;
+    } = { status };
 
     if (status === "completed") {
       const amount = Number(finalAmounts[booking._id]);
@@ -165,7 +166,6 @@ const payload: {
 
       if (response.data?.success) {
         toast.success(response.data.message || "Booking updated.");
-
         await loadBookings();
       } else {
         toast.error(response.data?.message || "Update failed.");
@@ -263,7 +263,6 @@ const payload: {
   return (
     <section className="min-h-screen bg-slate-50 px-4 py-12 sm:px-6">
       <div className="mx-auto max-w-7xl">
-        {/* Back link */}
         <Link
           href="/dashboard/technician/my-services"
           className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-teal-700"
@@ -272,7 +271,6 @@ const payload: {
           Back to My Services
         </Link>
 
-        {/* Heading */}
         <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
             <span className="text-xs font-extrabold uppercase tracking-[0.15em] text-teal-700">
@@ -298,7 +296,6 @@ const payload: {
           </button>
         </div>
 
-        {/* Statistics */}
         <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {[
             {
@@ -344,7 +341,6 @@ const payload: {
           ))}
         </div>
 
-        {/* Filters */}
         <div className="mb-6 flex flex-wrap gap-2">
           {filters.map((item) => (
             <button
@@ -368,7 +364,6 @@ const payload: {
           ))}
         </div>
 
-        {/* Booking list */}
         {filteredBookings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-16 text-center">
             <Inbox className="mx-auto mb-4 h-12 w-12 text-slate-300" />
@@ -401,13 +396,15 @@ const payload: {
                 className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
               >
                 <div className="flex flex-col gap-5 p-5 sm:p-6 lg:flex-row">
-                  {/* Service image */}
-                  <div className="h-48 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-40 sm:w-52">
+                  <div className="relative h-48 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-40 sm:w-52">
                     {booking.serviceImage ? (
-                      <img
+                      <Image
                         src={booking.serviceImage}
                         alt={booking.serviceTitle}
-                        className="h-full w-full object-cover"
+                        fill
+                        sizes="(max-width: 640px) 100vw, 208px"
+                        unoptimized
+                        className="object-cover"
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center">
@@ -416,7 +413,6 @@ const payload: {
                     )}
                   </div>
 
-                  {/* Booking information */}
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <span className="text-xs font-bold uppercase tracking-wider text-teal-700">
@@ -473,7 +469,6 @@ const payload: {
                       </p>
                     </div>
 
-                    {/* Problem description */}
                     <div className="mt-5 rounded-xl bg-slate-50 p-4">
                       <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
                         Customer Problem
@@ -483,7 +478,6 @@ const payload: {
                       </p>
                     </div>
 
-                    {/* Payment information */}
                     {booking.status === "completed" && (
                       <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
                         <span className="font-bold text-slate-700">
@@ -502,7 +496,6 @@ const payload: {
                       </div>
                     )}
 
-                    {/* Actions */}
                     <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-5">
                       {booking.status === "requested" && (
                         <>

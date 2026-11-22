@@ -65,7 +65,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-md">
-      <nav className="container-custom flex h-[76px] items-center justify-between">
+      <nav className="container-custom flex h-19 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-700 text-white">
             <Wrench size={22} />

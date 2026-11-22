@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   CalendarDays,
@@ -57,6 +59,7 @@ const filters = [
 ];
 
 export default function CustomerBookingsPage() {
+  const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -86,14 +89,14 @@ export default function CustomerBookingsPage() {
     if (isPending) return;
 
     if (!session) {
-      window.location.href = "/sign-in";
+      router.push("/sign-in");
       return;
     }
 
     const role = (session.user as { role?: string }).role;
 
     if (role !== "customer") {
-      window.location.href = "/";
+      router.push("/");
       return;
     }
 
@@ -108,7 +111,7 @@ export default function CustomerBookingsPage() {
     return () => {
       active = false;
     };
-  }, [isPending, session, loadBookings]);
+  }, [isPending, session, loadBookings, router]);
 
   const handleRefresh = async () => {
     setLoading(true);
@@ -159,6 +162,7 @@ export default function CustomerBookingsPage() {
         response.data?.success &&
         response.data?.checkoutUrl
       ) {
+        // External Stripe Checkout URL
         window.location.href = response.data.checkoutUrl;
         return;
       }
@@ -260,7 +264,6 @@ export default function CustomerBookingsPage() {
   return (
     <section className="min-h-screen bg-slate-50 px-4 py-12 sm:px-6">
       <div className="mx-auto max-w-7xl">
-
         {/* Page heading */}
         <div className="mb-8">
           <Link
@@ -442,13 +445,15 @@ export default function CustomerBookingsPage() {
                 className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
               >
                 <div className="flex flex-col gap-5 p-5 sm:p-6 lg:flex-row">
-
                   {/* Service image */}
-                  <div className="h-44 w-full shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-36 sm:w-44">
+                  <div className="relative h-44 w-full shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-36 sm:w-44">
                     {booking.serviceImage ? (
-                      <img
+                      <Image
                         src={booking.serviceImage}
                         alt={booking.serviceTitle}
+                        width={176}
+                        height={144}
+                        unoptimized
                         className="h-full w-full object-cover"
                       />
                     ) : (

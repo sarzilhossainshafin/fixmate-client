@@ -87,7 +87,7 @@ export default function ServicesPage() {
 
   return (
     <div className="min-h-screen">
-      <section className="bg-gradient-to-br from-teal-900 via-teal-800 to-slate-900 py-20 text-white">
+      <section className="bg-linear-to-br from-teal-900 via-teal-800 to-slate-900 py-20 text-white">
         <div className="container-custom">
           <span className="text-sm font-bold uppercase tracking-[0.2em] text-teal-300">
             Find the right professional
@@ -280,7 +280,7 @@ export default function ServicesPage() {
                       </div>
                       <Link
                         href={`/services/${service._id}`}
-                        className="btn-primary !px-4 !py-3"
+                        className="btn-primary px-4! 	py-3!"
                       >
                         View Details <ArrowRight size={16} />
                       </Link>

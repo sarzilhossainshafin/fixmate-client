@@ -1,7 +1,7 @@
 ﻿
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -18,7 +18,6 @@ import {
 import { toast } from "sonner";
 import api from "@/lib/api";
 
-
 type Payment = {
   _id: string;
   bookingId: string;
@@ -34,52 +33,38 @@ export default function CustomerPaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadPayments = useCallback(async () => {
-    try {
-      const response = await api.get("/payments/my");
+  useEffect(() => {
+    let isMounted = true;
 
-      if (response.data?.success) {
-        setPayments(response.data.payments || []);
-      } else {
-        toast.error("Failed to load payment history.");
+    const fetchPayments = async () => {
+      try {
+        const response = await api.get("/payments/my");
+
+        if (isMounted && response.data?.success) {
+          setPayments(response.data.payments || []);
+        } else if (isMounted) {
+          toast.error("Failed to load payment history.");
+        }
+      } catch (error) {
+        console.error("Payment history error:", error);
+
+        if (isMounted) {
+          toast.error("Unable to load payment history.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      console.error("Payment history error:", error);
-      toast.error("Unable to load payment history.");
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    void fetchPayments();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
- useEffect(() => {
-  let isMounted = true;
-
-  const fetchPayments = async () => {
-    try {
-      const response = await api.get("/payments/my");
-
-      if (isMounted && response.data?.success) {
-        setPayments(response.data.payments || []);
-      }
-    } catch (error) {
-      console.error("Payment history error:", error);
-
-      if (isMounted) {
-        toast.error("Unable to load payment history.");
-      }
-    } finally {
-      if (isMounted) {
-        setLoading(false);
-      }
-    }
-  };
-
-  fetchPayments();
-
-  return () => {
-    isMounted = false;
-  };
-}, []);
   const totalPaid = payments.reduce(
     (total, payment) => total + Number(payment.amount || 0),
     0

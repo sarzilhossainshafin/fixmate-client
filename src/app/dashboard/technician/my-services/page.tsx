@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   Plus,
   Wrench,
@@ -36,6 +38,7 @@ type Service = {
 };
 
 export default function MyServicesPage() {
+  const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
   const [services, setServices] = useState<Service[]>([]);
@@ -43,7 +46,6 @@ export default function MyServicesPage() {
   const [actionId, setActionId] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
 
-  // Fetch technician services
   const loadServices = useCallback(async () => {
     try {
       const response = await api.get("/services/my");
@@ -61,19 +63,18 @@ export default function MyServicesPage() {
     }
   }, []);
 
-  // Authentication and role check
   useEffect(() => {
     if (isPending) return;
 
     if (!session) {
-      window.location.href = "/sign-in";
+      router.replace("/sign-in");
       return;
     }
 
     const role = (session.user as { role?: string }).role;
 
     if (role !== "technician") {
-      window.location.href = "/";
+      router.replace("/");
       return;
     }
 
@@ -88,15 +89,13 @@ export default function MyServicesPage() {
     return () => {
       active = false;
     };
-  }, [isPending, session, loadServices]);
+  }, [isPending, session, router, loadServices]);
 
-  // Refresh services (button click)
   const handleRefresh = async () => {
     setLoading(true);
     await loadServices();
   };
 
-  // Delete service
   const handleDelete = async (id: string) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this service?"
@@ -124,7 +123,6 @@ export default function MyServicesPage() {
     }
   };
 
-  // Toggle service availability
   const handleAvailability = async (id: string) => {
     try {
       setActionId(id);
@@ -155,7 +153,6 @@ export default function MyServicesPage() {
     }
   };
 
-  // Filter services
   const filteredServices =
     filter === "all"
       ? services
@@ -163,7 +160,6 @@ export default function MyServicesPage() {
           (service) => service.approvalStatus === filter
         );
 
-  // Status styles
   const getStatusStyle = (status: Service["approvalStatus"]) => {
     switch (status) {
       case "approved":
@@ -175,7 +171,6 @@ export default function MyServicesPage() {
     }
   };
 
-  // Loading state
   if (isPending || loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -184,7 +179,6 @@ export default function MyServicesPage() {
     );
   }
 
-  // Not logged in
   if (!session) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
@@ -200,7 +194,6 @@ export default function MyServicesPage() {
     );
   }
 
-  // Technician role check
   const userRole = (session.user as { role?: string }).role;
 
   if (userRole !== "technician") {
@@ -221,8 +214,6 @@ export default function MyServicesPage() {
   return (
     <section className="min-h-screen bg-slate-50 px-4 py-12 sm:px-6">
       <div className="mx-auto max-w-7xl">
-
-        {/* Back link */}
         <Link
           href="/dashboard/technician/add-service"
           className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-teal-700"
@@ -231,7 +222,6 @@ export default function MyServicesPage() {
           Back to Add Service
         </Link>
 
-        {/* Page heading */}
         <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
             <span className="text-xs font-extrabold uppercase tracking-[0.15em] text-teal-700">
@@ -267,7 +257,6 @@ export default function MyServicesPage() {
           </div>
         </div>
 
-        {/* Statistics */}
         <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {[
             {
@@ -311,7 +300,6 @@ export default function MyServicesPage() {
           ))}
         </div>
 
-        {/* Filters */}
         <div className="mb-6 flex flex-wrap gap-2">
           {[
             { label: "All Services", value: "all" },
@@ -333,7 +321,6 @@ export default function MyServicesPage() {
           ))}
         </div>
 
-        {/* Service list */}
         {filteredServices.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-16 text-center">
             <Wrench className="mx-auto mb-4 h-12 w-12 text-slate-300" />
@@ -367,13 +354,21 @@ export default function MyServicesPage() {
                 key={service._id}
                 className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
               >
-                {/* Service image */}
                 <div className="relative h-48 bg-slate-100">
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="h-full w-full object-cover"
-                  />
+                  {service.image ? (
+                    <Image
+                      src={service.image}
+                      alt={service.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                      unoptimized
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <Wrench className="h-10 w-10 text-slate-300" />
+                    </div>
+                  )}
 
                   <span
                     className={`absolute right-3 top-3 rounded-full px-3 py-1.5 text-xs font-bold capitalize ${getStatusStyle(
@@ -415,7 +410,6 @@ export default function MyServicesPage() {
                     </p>
                   </div>
 
-                  {/* Service actions */}
                   <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
                     <span
                       className={`text-xs font-bold ${
@@ -428,7 +422,6 @@ export default function MyServicesPage() {
                     </span>
 
                     <div className="flex items-center gap-2">
-                      {/* Availability */}
                       <button
                         onClick={() => handleAvailability(service._id)}
                         disabled={actionId === service._id}
@@ -446,7 +439,6 @@ export default function MyServicesPage() {
                         )}
                       </button>
 
-                      {/* Edit */}
                       <Link
                         href={`/dashboard/technician/edit-service/${service._id}`}
                         title="Edit service"
@@ -455,7 +447,6 @@ export default function MyServicesPage() {
                         <Pencil size={16} />
                       </Link>
 
-                      {/* Delete */}
                       <button
                         onClick={() => handleDelete(service._id)}
                         disabled={actionId === service._id}

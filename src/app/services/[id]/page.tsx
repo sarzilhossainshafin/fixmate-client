@@ -1,7 +1,8 @@
 
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
+import Image from "next/image";
+import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient, useSession } from "@/lib/auth-client";
@@ -44,46 +45,15 @@ function ServiceDetailsContent() {
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
   // Load service details
-  const loadService = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `${apiUrl}/services/${serviceId}`,
-        {
-          credentials: "include",
-          cache: "no-store",
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok || !result.success || !result.service) {
-        throw new Error(result.message || "Service not found.");
-      }
-
-      setService(result.service);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to load service details."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [apiUrl, serviceId]);
-
   useEffect(() => {
     let active = true;
 
     async function fetchService() {
       try {
-        const response = await fetch(
-          `${apiUrl}/services/${serviceId}`,
-          {
-            credentials: "include",
-            cache: "no-store",
-          }
-        );
+        const response = await fetch(`${apiUrl}/services/${serviceId}`, {
+          credentials: "include",
+          cache: "no-store",
+        });
 
         const result = await response.json();
 
@@ -153,19 +123,21 @@ function ServiceDetailsContent() {
       setError("");
 
       const { data: tokenData, error: tokenError } =
-  await authClient.token();
+        await authClient.token();
 
-if (tokenError || !tokenData?.token) {
-  throw new Error("Unable to get authentication token. Please sign in again.");
-}
+      if (tokenError || !tokenData?.token) {
+        throw new Error(
+          "Unable to get authentication token. Please sign in again."
+        );
+      }
 
-const response = await fetch(`${apiUrl}/bookings`, {
-  method: "POST",
-  credentials: "include",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${tokenData.token}`,
-  },
+      const response = await fetch(`${apiUrl}/bookings`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenData.token}`,
+        },
         body: JSON.stringify({
           serviceId,
           customerPhone: customerPhone.trim(),
@@ -239,7 +211,6 @@ const response = await fetch(`${apiUrl}/bookings`, {
   return (
     <main className="min-h-screen bg-base-200 px-4 py-10">
       <div className="mx-auto max-w-6xl">
-
         <Link
           href="/services"
           className="mb-6 inline-block text-sm font-semibold text-primary hover:underline"
@@ -248,14 +219,15 @@ const response = await fetch(`${apiUrl}/bookings`, {
         </Link>
 
         <div className="grid gap-8 lg:grid-cols-2">
-
           {/* Service Details */}
           <section className="card overflow-hidden bg-base-100 shadow-xl">
-
             {serviceImage ? (
-              <img
+              <Image
                 src={serviceImage}
                 alt={serviceName}
+                width={900}
+                height={520}
+                unoptimized
                 className="h-72 w-full object-cover"
               />
             ) : (
@@ -265,7 +237,6 @@ const response = await fetch(`${apiUrl}/bookings`, {
             )}
 
             <div className="card-body">
-
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="badge badge-primary badge-outline">
                   {service.category || "Repair Service"}
@@ -313,14 +284,12 @@ const response = await fetch(`${apiUrl}/bookings`, {
                     "Assigned technician"}
                 </p>
               </div>
-
             </div>
           </section>
 
           {/* Booking Form */}
           <section className="card h-fit bg-base-100 shadow-xl">
             <div className="card-body">
-
               <h2 className="card-title text-2xl">
                 Book This Service
               </h2>
@@ -347,7 +316,6 @@ const response = await fetch(`${apiUrl}/bookings`, {
                   onSubmit={handleBooking}
                   className="space-y-4"
                 >
-
                   {/* Phone */}
                   <div>
                     <label className="label">
@@ -451,13 +419,10 @@ const response = await fetch(`${apiUrl}/bookings`, {
                   <p className="text-center text-xs text-base-content/60">
                     Payment will be available after the technician completes the job.
                   </p>
-
                 </form>
               )}
-
             </div>
           </section>
-
         </div>
       </div>
     </main>
