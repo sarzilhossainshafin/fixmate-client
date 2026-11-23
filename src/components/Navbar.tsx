@@ -11,6 +11,7 @@ import {
   ArrowRight,
   UserCircle,
   LogOut,
+  UserRound,
 } from "lucide-react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
@@ -96,7 +97,10 @@ export default function Navbar() {
             <div className="h-9 w-24 animate-pulse rounded-lg bg-slate-100" />
           ) : isLoggedIn ? (
             <>
-              <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
+              <Link
+                href="/dashboard/profile"
+                className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 transition hover:bg-teal-50"
+              >
                 <UserCircle size={20} className="text-teal-700" />
 
                 <div>
@@ -108,7 +112,14 @@ export default function Navbar() {
                     {user.role || "User"}
                   </p>
                 </div>
-              </div>
+              </Link>
+
+              <Link
+                href="/dashboard/profile"
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-teal-300 hover:text-teal-700"
+              >
+                My Profile
+              </Link>
 
               <button
                 type="button"
@@ -181,11 +192,20 @@ export default function Navbar() {
                   </div>
                 </div>
 
+                <Link
+                  href="/dashboard/profile"
+                  onClick={closeMenu}
+                  className="flex items-center gap-3 rounded-lg py-2 text-sm font-bold text-teal-700"
+                >
+                  <UserRound size={18} />
+                  My Profile
+                </Link>
+
                 <button
                   type="button"
                   onClick={handleSignOut}
                   disabled={loggingOut}
-                  className="flex items-center gap-2 py-2 text-left text-sm font-bold text-red-600"
+                  className="flex items-center gap-2 py-2 text-left text-sm font-bold text-red-600 disabled:opacity-50"
                 >
                   <LogOut size={17} />
                   {loggingOut ? "Signing out..." : "Sign Out"}
