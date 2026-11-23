@@ -12,6 +12,7 @@ import {
   UserCircle,
   LogOut,
   UserRound,
+  LayoutDashboard,
 } from "lucide-react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
@@ -38,6 +39,13 @@ export default function Navbar() {
     | undefined;
 
   const isLoggedIn = !!user;
+
+  const dashboardHref =
+    user?.role === "admin"
+      ? "/dashboard/admin"
+      : user?.role === "technician"
+        ? "/dashboard/technician"
+        : "/dashboard/customer";
 
   const handleSignOut = async () => {
     setLoggingOut(true);
@@ -97,6 +105,14 @@ export default function Navbar() {
             <div className="h-9 w-24 animate-pulse rounded-lg bg-slate-100" />
           ) : isLoggedIn ? (
             <>
+              <Link
+                href={dashboardHref}
+                className="flex items-center gap-2 rounded-lg bg-teal-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-teal-800"
+              >
+                <LayoutDashboard size={17} />
+                Dashboard
+              </Link>
+
               <Link
                 href="/dashboard/profile"
                 className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 transition hover:bg-teal-50"
@@ -191,6 +207,15 @@ export default function Navbar() {
                     </p>
                   </div>
                 </div>
+
+                <Link
+                  href={dashboardHref}
+                  onClick={closeMenu}
+                  className="flex items-center gap-3 rounded-lg bg-teal-700 px-4 py-3 text-sm font-bold text-white"
+                >
+                  <LayoutDashboard size={18} />
+                  Dashboard
+                </Link>
 
                 <Link
                   href="/dashboard/profile"
